@@ -5,13 +5,16 @@ setup(
     version='0.1.0',
     packages=find_packages(),
     install_requires=[
-        # list your dependencies here, e.g.,
-        # 'numpy',
+        'elasticsearch~=8.13.0',
+        'redis',
+        'pymongo',
+        'requests',
+        'sqlalchemy',
+        'psycopg2'
     ],
     author='Feedback Intelligence',
     author_email='tigran@manot.ai',
     description='Connectors for different databases',
-    url='https://github.com/yourusername/my_package',
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
