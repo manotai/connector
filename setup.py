@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='my_package',
     version='0.1.0',
-    packages=find_packages(),
+    packages=find_packages(include=['dynamoDB', 'elastic', 'mongoDB', 'postgres', 'redis']),
     install_requires=[
         'elasticsearch~=8.13.0',
         'redis',
