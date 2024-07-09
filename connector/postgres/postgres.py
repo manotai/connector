@@ -77,6 +77,8 @@ class UserMessages(Base):
     question = Column(String)
     prompt = Column(String)
     knowledge_hole_probability = Column(Float)
+    faithfulness = Column(Float)
+    response_relevance = Column(Float)
     date = Column(DateTime, nullable=False, default=datetime.utcnow)
     sentiment = Column(Float, nullable=True)
     chat_id = Column(Integer, nullable=True)
