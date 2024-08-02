@@ -136,6 +136,54 @@ class FeedbacksOriginal(Base):
     rating = Column(Float, nullable=True)
 
 
+class User(Base):
+    __tablename__ = 'user'
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    username = Column(String, nullable=False, unique=True)
+    password = Column(String, nullable=False)
+
+
+class Dataset(Base):
+    __tablename__ = 'dataset'
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    name = Column(String, nullable=False)
+    company_id = Column(Integer, nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=True)
+    date = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    messages = relationship('DatasetMessage', secondary=datasetMessage_dataset_association, back_populates='dataset')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "company_id": self.company_id,
+            "user_id": self.user_id,
+            "date": str(self.date),
+            "messages": [
+                {
+                    "id": message.id,
+                    "user_message_text": message.user_message.question if message.user_message else None,
+                    "answer": message.answer if message.answer else message.user_message.answer.text,
+                    "edited": True if message.answer else False,
+                    "gt_answer": message.gt_answer,
+                }
+                for message in self.messages
+            ],
+        }
+
+
+class DatasetMessage(Base):
+    __tablename__ = 'datesetMessage'
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    user_message_id = Column(Integer, ForeignKey('userMessages.id'), nullable=False)
+    answer = Column(String, nullable=True)
+    gt_answer = Column(String, nullable=True)
+
+    dataset = relationship("Dataset", secondary=datasetMessage_dataset_association, back_populates='messages')
+    user_message = relationship("UserMessages", foreign_keys=[user_message_id])
+
+
 class PostgreSQLWrapper:
     """
         A wrapper class for handling PostgreSQL database operations using SQLAlchemy.
@@ -331,44 +379,3 @@ class PostgreSQLWrapper:
         except Exception as e:
             print(f"Error finding instances with filters {filters}: {e}")
             return []
-
-
-class Dataset(Base):
-    __tablename__ = 'dataset'
-    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    name = Column(String, nullable=False)
-    company_id = Column(Integer, nullable=False)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=True)
-    date = Column(DateTime, nullable=False, default=datetime.utcnow)
-
-    messages = relationship('DatasetMessage', secondary=datasetMessage_dataset_association, back_populates='dataset')
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "company_id": self.company_id,
-            "user_id": self.user_id,
-            "date": str(self.date),
-            "messages": [
-                {
-                    "id": message.id,
-                    "user_message_text": message.user_message.question if message.user_message else None,
-                    "answer": message.answer if message.answer else message.user_message.answer.text,
-                    "edited": True if message.answer else False,
-                    "gt_answer": message.gt_answer,
-                }
-                for message in self.messages
-            ],
-        }
-
-
-class DatasetMessage(Base):
-    __tablename__ = 'datesetMessage'
-    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    user_message_id = Column(Integer, ForeignKey('userMessages.id'), nullable=False)
-    answer = Column(String, nullable=True)
-    gt_answer = Column(String, nullable=True)
-
-    dataset = relationship("Dataset", secondary=datasetMessage_dataset_association, back_populates='messages')
-    user_message = relationship("UserMessages", foreign_keys=[user_message_id])
