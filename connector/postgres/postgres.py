@@ -22,6 +22,12 @@ datasetMessage_dataset_association = Table('datasetMessage_dataset', Base.metada
                                            Column('dataset_id', Integer, ForeignKey('dataset.id')),
                                            Column('dataset_message_id', Integer, ForeignKey('datesetMessage.id')))
 
+topics_userMessages_association = Table('topics_userMessages', Base.metadata,
+                                        Column('id', Integer, primary_key=True),
+                                        Column('topic_id', Integer, ForeignKey('topics.id'), primary_key=False),
+                                        Column('user_message_id', Integer, ForeignKey('userMessages.id'),
+                                               primary_key=False))
+
 
 class Feedbacks(Base):
     __tablename__ = 'feedbacks'
@@ -52,6 +58,17 @@ class Issues(Base):
 
     feedbacks = relationship("Feedbacks", secondary=feedbacks_issues_association, back_populates="issues")
     user_messages = relationship("UserMessages", secondary=issues_userMessages_association, back_populates="issues")
+
+
+class Topics(Base):
+    __tablename__ = 'topics'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=True)
+    text = Column(String, nullable=True)
+    date = Column(DateTime, nullable=True)
+
+    user_messages = relationship("UserMessages", secondary=topics_userMessages_association, back_populates="topics")
 
 
 class Contexts(Base):
