@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, Table, Float, DateTime
+from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, Table, Float, DateTime, update
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship, joinedload
 from sqlalchemy import and_
@@ -396,3 +396,33 @@ class PostgreSQLWrapper:
         except Exception as e:
             print(f"Error finding instances with filters {filters}: {e}")
             return []
+
+    def update_many_to_many(self, association, field: str, change: dict):
+        """
+        Updates a many-to-many relationship field for a given model.
+
+        Parameters:
+        - model: The SQLAlchemy model class to update.
+        - field: The name of the many-to-many relationship field.
+        - change: A dictionary where keys are the current values and values are the new values.
+
+        example update_many_to_many(association=feedbacks_issues_association, field="issue_id", change={'from':3, 'to':4}
+        """
+        session = self.get_session()
+
+        if "to" not in change or "from" not in change:
+            raise ValueError("Argument change is invalid should include both 'to' and 'from'")
+        try:
+
+            stmt = update(association).where(
+                association.c[field] == change['from']
+            ).values(**{field: change['to']})
+
+            session.execute(stmt)
+
+            session.execute(stmt)
+
+            # Commit the transaction to save changes
+            session.commit()
+        except Exception as e:
+            print(f"An error occurred: {e}")
