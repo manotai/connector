@@ -110,6 +110,8 @@ class UserMessages(Base):
     context = relationship("Contexts", foreign_keys=[context_id])
     answer = relationship("ChatBotAnswers", foreign_keys=[answer_id])
     issues = relationship("Issues", secondary=issues_userMessages_association, back_populates="user_messages")
+    topics = relationship("Topics", secondary=topics_userMessages_association, back_populates="user_messages")
+
 
 
 class MessagesOriginal(Base):
@@ -129,6 +131,7 @@ class MessagesOriginal(Base):
 
     feedback = relationship("FeedbacksOriginal", foreign_keys=[feedback_id])
     context = relationship("ContextsOriginal", foreign_keys=[context_id])
+
 
 
 class ContextsOriginal(Base):
@@ -169,25 +172,6 @@ class Dataset(Base):
     date = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     messages = relationship('DatasetMessage', secondary=datasetMessage_dataset_association, back_populates='dataset')
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "company_id": self.company_id,
-            "user_id": self.user_id,
-            "date": str(self.date),
-            "messages": [
-                {
-                    "id": message.id,
-                    "user_message_text": message.user_message.question if message.user_message else None,
-                    "answer": message.answer if message.answer else message.user_message.answer.text,
-                    "edited": True if message.answer else False,
-                    "gt_answer": message.gt_answer,
-                }
-                for message in self.messages
-            ],
-        }
 
 
 class DatasetMessage(Base):
