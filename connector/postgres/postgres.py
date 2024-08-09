@@ -101,6 +101,7 @@ class UserMessages(Base):
     knowledge_hole_probability = Column(Float)
     faithfulness = Column(Float)
     response_relevance = Column(Float)
+    satisfaction = Column(Float)
     date = Column(DateTime, nullable=False, default=datetime.utcnow)
     sentiment = Column(Float, nullable=True)
     chat_id = Column(Integer, nullable=True)
@@ -111,7 +112,6 @@ class UserMessages(Base):
     answer = relationship("ChatBotAnswers", foreign_keys=[answer_id])
     issues = relationship("Issues", secondary=issues_userMessages_association, back_populates="user_messages")
     topics = relationship("Topics", secondary=topics_userMessages_association, back_populates="user_messages")
-
 
 
 class MessagesOriginal(Base):
@@ -131,7 +131,6 @@ class MessagesOriginal(Base):
 
     feedback = relationship("FeedbacksOriginal", foreign_keys=[feedback_id])
     context = relationship("ContextsOriginal", foreign_keys=[context_id])
-
 
 
 class ContextsOriginal(Base):
