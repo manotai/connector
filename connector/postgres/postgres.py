@@ -176,9 +176,12 @@ class Dataset(Base):
 class DatasetMessage(Base):
     __tablename__ = 'datesetMessage'
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    user_message_id = Column(Integer, ForeignKey('userMessages.id'), nullable=False)
+    user_message_id = Column(Integer, ForeignKey('userMessages.id'), nullable=True)
     answer = Column(String, nullable=True)
     gt_answer = Column(String, nullable=True)
+    expert_response = Column(String, nullable=True)
+    query = Column(String, nullable=True)
+    date = Column(DateTime, default=datetime.utcnow)
 
     dataset = relationship("Dataset", secondary=datasetMessage_dataset_association, back_populates='messages')
     user_message = relationship("UserMessages", foreign_keys=[user_message_id])
