@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, Table, Float, DateTime, update
+from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, Table, Float, DateTime, update, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship, joinedload
 from sqlalchemy import and_
