@@ -169,6 +169,7 @@ class Dataset(Base):
     company_id = Column(Integer, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=True)
     date = Column(DateTime, nullable=False, default=datetime.utcnow)
+    uploaded = Column(Boolean, nullable=False, default=False)
 
     messages = relationship('DatasetMessage', secondary=datasetMessage_dataset_association, back_populates='dataset')
 
