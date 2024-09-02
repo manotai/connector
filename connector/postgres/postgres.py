@@ -91,7 +91,7 @@ class Contexts(Base):
     __tablename__ = 'contexts'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    company_id = Column(Integer, nullable=False)
+    project_id = Column(Integer, nullable=True)
     text = Column(String, nullable=False)
 
     __table_args__ = (
@@ -159,7 +159,7 @@ class ContextsOriginal(Base):
     __tablename__ = 'contextsOriginal'
 
     id = Column(Integer, nullable=False, primary_key=True)
-    company_id = Column(Integer, nullable=False)
+    project_id = Column(Integer, nullable=True)
     text = Column(String, nullable=False)
 
     __table_args__ = (
