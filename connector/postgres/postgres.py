@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, Table, Float, DateTime, update, Boolean
+from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, Table, Float, DateTime, update, Boolean, \
+    Index
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship, joinedload
 from sqlalchemy import and_
@@ -8,14 +9,16 @@ from sqlalchemy import and_
 Base = declarative_base()
 
 feedbacks_issues_association = Table('feedbacks_issues', Base.metadata,
-                                     Column('feedback_id', Integer, ForeignKey('feedbacks.id'), primary_key=True),
-                                     Column('issue_id', Integer, ForeignKey('issues.id'), primary_key=True)
+                                     Column('id', Integer, primary_key=True),
+                                     Column('feedback_id', Integer, ForeignKey('feedbacks.id'), primary_key=False),
+                                     Column('issue_id', Integer, ForeignKey('issues.id'), primary_key=False)
                                      )
 
 issues_userMessages_association = Table('issues_userMessages', Base.metadata,
-                                        Column('issue_id', Integer, ForeignKey('issues.id'), primary_key=True),
+                                        Column('id', Integer, primary_key=True),
+                                        Column('issue_id', Integer, ForeignKey('issues.id'), primary_key=False),
                                         Column('user_message_id', Integer, ForeignKey('userMessages.id'),
-                                               primary_key=True))
+                                               primary_key=False))
 
 datasetMessage_dataset_association = Table('datasetMessage_dataset', Base.metadata,
                                            Column('id', Integer, primary_key=True),
@@ -28,13 +31,18 @@ topics_userMessages_association = Table('topics_userMessages', Base.metadata,
                                         Column('user_message_id', Integer, ForeignKey('userMessages.id'),
                                                primary_key=False))
 
+user_project_association = Table('user_projects', Base.metadata,
+                                 Column('id', Integer, primary_key=True),
+                                 Column('user_id', Integer, ForeignKey('user.id'), primary_key=False),
+                                 Column('project_id', Integer, ForeignKey('project.id'),
+                                        primary_key=False))
+
 
 class Feedbacks(Base):
     __tablename__ = 'feedbacks'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, nullable=True)
-    company_id = Column(Integer, nullable=True)
     text = Column(String, nullable=True)
     sentiment = Column(Float, nullable=True)
     date = Column(DateTime, nullable=True, default=datetime.utcnow)
@@ -43,6 +51,8 @@ class Feedbacks(Base):
     thumbs_up = Column(String, nullable=True)
     rating = Column(Float, nullable=True)
 
+    project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
+    project = relationship('Project', foreign_keys=[project_id])
     issues = relationship("Issues", secondary=feedbacks_issues_association, back_populates="feedbacks")
 
 
@@ -56,6 +66,9 @@ class Issues(Base):
     date = Column(DateTime, nullable=True)
     resolved = Column(DateTime, nullable=True)
 
+    project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
+    project = relationship('Project', foreign_keys=[project_id])
+
     feedbacks = relationship("Feedbacks", secondary=feedbacks_issues_association, back_populates="issues")
     user_messages = relationship("UserMessages", secondary=issues_userMessages_association, back_populates="issues")
 
@@ -68,6 +81,9 @@ class Topics(Base):
     text = Column(String, nullable=True)
     date = Column(DateTime, nullable=True)
 
+    project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
+    project = relationship('Project', foreign_keys=[project_id])
+
     user_messages = relationship("UserMessages", secondary=topics_userMessages_association, back_populates="topics")
 
 
@@ -77,6 +93,10 @@ class Contexts(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(Integer, nullable=False)
     text = Column(String, nullable=False)
+
+    __table_args__ = (
+        Index('idx_content_hash', 'text', postgresql_using='hash'),
+    )
 
 
 class ChatBotAnswers(Base):
@@ -95,7 +115,6 @@ class UserMessages(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, nullable=True)
-    company_id = Column(Integer, nullable=False)
     question = Column(String)
     prompt = Column(String)
     knowledge_hole_probability = Column(Float)
@@ -105,9 +124,12 @@ class UserMessages(Base):
     date = Column(DateTime, nullable=False, default=datetime.utcnow)
     sentiment = Column(Float, nullable=True)
     chat_id = Column(Integer, nullable=True)
+
+    project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
     context_id = Column(Integer, ForeignKey('contexts.id'), nullable=False)
     answer_id = Column(Integer, ForeignKey('chatBotAnswers.id'), nullable=False)
 
+    project = relationship('Project', foreign_keys=[project_id])
     context = relationship("Contexts", foreign_keys=[context_id])
     answer = relationship("ChatBotAnswers", foreign_keys=[answer_id])
     issues = relationship("Issues", secondary=issues_userMessages_association, back_populates="user_messages")
@@ -119,7 +141,7 @@ class MessagesOriginal(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, nullable=True)
-    company_id = Column(Integer, nullable=False)
+    project_id = Column(Integer, nullable=True)
     role = Column(String, nullable=False)
     text = Column(String, nullable=False)
     prompt = Column(String, nullable=True)
@@ -140,13 +162,17 @@ class ContextsOriginal(Base):
     company_id = Column(Integer, nullable=False)
     text = Column(String, nullable=False)
 
+    __table_args__ = (
+        Index('idx_contentOriginal_hash', 'text', postgresql_using='hash'),
+    )
+
 
 class FeedbacksOriginal(Base):
     __tablename__ = 'feedbacksOriginal'
 
     id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(Integer, nullable=True)
-    company_id = Column(Integer, nullable=False)
+    project_id = Column(Integer, nullable=True)
     text = Column(String, nullable=True)
     date = Column(DateTime, nullable=False, default=datetime.utcnow)
     source = Column(String, nullable=False)
@@ -157,20 +183,35 @@ class FeedbacksOriginal(Base):
 
 class User(Base):
     __tablename__ = 'user'
+
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     username = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
+
+    projects = relationship('Project', secondary=user_project_association, back_populates='users')
+
+
+class Project(Base):
+    __tablename__ = 'project'
+
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    author_id = Column(Integer, ForeignKey('user.id'), nullable=True)
+
+    users = relationship('User', secondary=user_project_association, back_populates='projects')
 
 
 class Dataset(Base):
     __tablename__ = 'dataset'
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     name = Column(String, nullable=False)
-    company_id = Column(Integer, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=True)
     date = Column(DateTime, nullable=False, default=datetime.utcnow)
     uploaded = Column(Boolean, nullable=False, default=False)
 
+    project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
+    project = relationship('Project', foreign_keys=[project_id])
     messages = relationship('DatasetMessage', secondary=datasetMessage_dataset_association, back_populates='dataset')
 
 
@@ -183,6 +224,7 @@ class DatasetMessage(Base):
     expert_response = Column(String, nullable=True)
     query = Column(String, nullable=True)
     date = Column(DateTime, default=datetime.utcnow)
+    context = Column(String, nullable=True)
 
     dataset = relationship("Dataset", secondary=datasetMessage_dataset_association, back_populates='messages')
     user_message = relationship("UserMessages", foreign_keys=[user_message_id])
