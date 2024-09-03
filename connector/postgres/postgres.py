@@ -187,8 +187,21 @@ class User(Base):
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     username = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
+    current_token_count = Column(Integer, nullable=False, default=0)
 
+    plan_id = Column(Integer, ForeignKey('user_plan.id'), nullable=True)
+
+    plan = relationship('UserPlan', foreign_keys=[plan_id])
     projects = relationship('Project', secondary=user_project_association, back_populates='users')
+
+
+class UserPlan(Base):
+    __tablename__ = 'user_plan'
+
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    name = Column(String, nullable=False, unique=True)
+    max_tokens = Column(Integer, nullable=True)
+    max_projects = Column(Integer, nullable=True)
 
 
 class Project(Base):
