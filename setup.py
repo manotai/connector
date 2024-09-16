@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='connector',
-    version='0.2.3',
+    version='0.2.4',
     packages=find_packages(include=['connector', 'connector.*']),
     install_requires=[
         'elasticsearch~=8.13.0',

@@ -44,7 +44,7 @@ class Feedbacks(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, nullable=True)
     text = Column(String, nullable=True)
-    sentiment = Column(Float, nullable=True)
+    sentiment = Column(String, nullable=True)
     date = Column(DateTime, nullable=True, default=datetime.utcnow)
     source = Column(String, nullable=False)
     chat_id = Column(Integer, nullable=True)
@@ -103,7 +103,7 @@ class ChatBotAnswers(Base):
     __tablename__ = 'chatBotAnswers'
     id = Column(Integer, primary_key=True, autoincrement=True)
     text = Column(String, nullable=False)
-    sentiment = Column(Float, nullable=True)
+    sentiment = Column(String, nullable=True)
     version = Column(String, nullable=True)
 
     feedback_id = Column(Integer, ForeignKey("feedbacks.id"), nullable=True)
@@ -118,11 +118,9 @@ class UserMessages(Base):
     question = Column(String)
     prompt = Column(String)
     knowledge_hole_probability = Column(Float)
-    faithfulness = Column(Float)
-    response_relevance = Column(Float)
-    satisfaction = Column(Float)
+    satisfaction = Column(String, nullable=True)
     date = Column(DateTime, nullable=False, default=datetime.utcnow)
-    sentiment = Column(Float, nullable=True)
+    sentiment = Column(String, nullable=True)
     chat_id = Column(Integer, nullable=True)
 
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
