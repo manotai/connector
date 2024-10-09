@@ -37,6 +37,13 @@ user_project_association = Table('user_projects', Base.metadata,
                                  Column('project_id', Integer, ForeignKey('project.id'),
                                         primary_key=False))
 
+user_message_keyword = Table('user_message_keyword', Base.metadata,
+                             Column('id', Integer, primary_key=True),
+                             Column('keyword_id', Integer, ForeignKey('keywords.id'), primary_key=False),
+                             Column('user_message_id', Integer, ForeignKey('userMessages.id'),
+                                    primary_key=False),
+                             Column('project_id', Integer, ForeignKey('project.id')))
+
 
 class Feedbacks(Base):
     __tablename__ = 'feedbacks'
@@ -132,6 +139,20 @@ class UserMessages(Base):
     answer = relationship("ChatBotAnswers", foreign_keys=[answer_id])
     issues = relationship("Issues", secondary=issues_userMessages_association, back_populates="user_messages")
     topics = relationship("Topics", secondary=topics_userMessages_association, back_populates="user_messages")
+    keywords = relationship("Keywords", secondary=user_message_keyword, back_populates="user_messages")
+
+
+class Keywords(Base):
+    __tablename__ = "keywords"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+
+    user_messages = relationship("UserMessages", secondary=user_message_keyword, back_populates="keywords")
+
+    __table_args__ = (
+        Index('ix_keywords_name', name),
+    )
 
 
 class MessagesOriginal(Base):
