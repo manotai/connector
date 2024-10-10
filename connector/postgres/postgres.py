@@ -314,6 +314,26 @@ class PostgreSQLWrapper:
             session.rollback()
             raise e
 
+    def addToM2mTables(self, *, model_name: Table, **kwargs):
+        """
+                    Adds a new instance to the database many to many connections.
+
+                    :param model_name: The association table name.
+                    :type model_name: Table
+                    :return: The added instance with updated attributes.
+                    :rtype: Base
+                    :raises Exception: If there is an error during the operation.
+        """
+        session = self.get_session()
+        try:
+            query = model_name.insert().values(**kwargs)
+            session.execute(query)
+            session.commit()
+            return True
+        except Exception as e:
+            session.rollback()
+            raise e
+
     @staticmethod
     def add_without_commit(instance, session):
         """

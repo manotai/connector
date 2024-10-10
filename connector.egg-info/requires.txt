@@ -1,0 +1,6 @@
+elasticsearch~=8.13.0
+redis
+pymongo
+requests
+sqlalchemy
+psycopg2
