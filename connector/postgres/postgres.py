@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, Table, Float, DateTime, update, Boolean, \
     Index
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship, joinedload
 from sqlalchemy import and_
 
@@ -316,7 +317,7 @@ class PostgreSQLWrapper:
 
     def addToM2mTables(self, *, model_name: Table, **kwargs):
         """
-                    Adds a new instance to the database many to many connections.
+                    Adds a new instance to the database many to many connections if does not already exist.
 
                     :param model_name: The association table name.
                     :type model_name: Table
@@ -326,9 +327,8 @@ class PostgreSQLWrapper:
         """
         session = self.get_session()
         try:
-            query = model_name.insert().values(**kwargs)
-            session.execute(query)
-            session.commit()
+            insert(model_name).values(**kwargs).on_conflict_do_nothing(
+                index_elements=kwargs.keys())
             return True
         except Exception as e:
             session.rollback()
