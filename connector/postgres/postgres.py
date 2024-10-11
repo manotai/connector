@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, Table, Float, DateTime, update, Boolean, \
-    Index
+    Index, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship, joinedload
@@ -43,7 +43,10 @@ user_message_keyword = Table('user_message_keyword', Base.metadata,
                              Column('keyword_id', Integer, ForeignKey('keywords.id'), primary_key=False),
                              Column('user_message_id', Integer, ForeignKey('userMessages.id'),
                                     primary_key=False),
-                             Column('project_id', Integer, ForeignKey('project.id')))
+                             Column('project_id', Integer, ForeignKey('project.id')),
+                             UniqueConstraint('keyword_id', 'user_message_id', 'project_id',
+                                              name='uix_keyword_message_project')
+                             )
 
 
 class Feedbacks(Base):
@@ -327,8 +330,10 @@ class PostgreSQLWrapper:
         """
         session = self.get_session()
         try:
-            insert(model_name).values(**kwargs).on_conflict_do_nothing(
+            query = insert(model_name).values(**kwargs).on_conflict_do_nothing(
                 index_elements=kwargs.keys())
+            session.execute(query)
+            session.commit()
             return True
         except Exception as e:
             session.rollback()
