@@ -56,6 +56,16 @@ user_message_association_custom_rules = Table('user_message_custom_rules', Base.
                                                                name='uix_rules_user_messages')
                                               )
 
+ruleTopics_userMessages_association = Table('ruleTopics_userMessages', Base.metadata,
+                                            Column('id', Integer, primary_key=True),
+                                            Column('rule_topic_id', Integer, ForeignKey('ruleTopic.id'),
+                                                   primary_key=False),
+                                            Column('user_message_id', Integer, ForeignKey('userMessages.id'),
+                                                   primary_key=False),
+                                            UniqueConstraint('rule_topic_id', 'user_message_id',
+                                                             name='uix_rules_topic_user_messages')
+                                            )
+
 
 class ProjectType(enum.Enum):
     public = "PUBLIC"
@@ -65,6 +75,12 @@ class ProjectType(enum.Enum):
 class IntentSatisfaction(str, enum.Enum):
     MET = "Met"
     UNMET = "Unmet"
+
+
+class QueriesAttemptEnum(str, enum.Enum):
+    SUCCESSFUL = "Successful"
+    UNSUCCESSFUL = "Unsuccessful"
+    AMBIGUOUS = "Ambiguous"
 
 
 class Feedbacks(Base):
@@ -102,6 +118,20 @@ class Issues(Base):
     user_messages = relationship("UserMessages", secondary=issues_userMessages_association, back_populates="issues")
 
 
+class RuleTopic(Base):
+    __tablename__ = 'ruleTopic'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    description = Column(String)
+    project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
+    answer_id = Column(Integer, ForeignKey('rules.id'), nullable=False)
+
+    user_messages = relationship("UserMessages",
+                                 secondary=ruleTopics_userMessages_association,
+                                 back_populates="rule_topics")
+
+
 class Rules(Base):
     __tablename__ = 'rules'
 
@@ -114,8 +144,7 @@ class Rules(Base):
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
 
     project = relationship('Project', foreign_keys=[project_id])
-    user_messages = relationship("UserMessages", secondary=user_message_association_custom_rules,
-                                 back_populates="rules")
+    topics = relationship('RuleTopic', backref='rule', foreign_keys='RuleTopic.answer_id')
 
     def to_dict(self):
         return {
@@ -177,7 +206,7 @@ class UserMessages(Base):
     date = Column(DateTime, nullable=False, default=datetime.utcnow)
     sentiment = Column(String, nullable=True)
     chat_id = Column(Integer, nullable=True)
-    success = Column(Boolean, nullable=True)
+    attempt = Column(Enum(QueriesAttemptEnum), nullable=True)
 
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
     context_id = Column(Integer, ForeignKey('contexts.id'), nullable=True)
