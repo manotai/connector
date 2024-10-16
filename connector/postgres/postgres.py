@@ -102,6 +102,32 @@ class Issues(Base):
     user_messages = relationship("UserMessages", secondary=issues_userMessages_association, back_populates="issues")
 
 
+class Rules(Base):
+    __tablename__ = 'rules'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    description = Column(String)
+    date = Column(DateTime, nullable=True)
+    system = Column(Boolean, default=False)
+    created_by_id = Column(Integer, ForeignKey("user.id"), nullable=True)
+    project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
+
+    project = relationship('Project', foreign_keys=[project_id])
+    user_messages = relationship("UserMessages", secondary=user_message_association_custom_rules,
+                                 back_populates="rules")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "date": str(self.date),
+            "project_id": self.project_id,
+            "system": self.system
+        }
+
+
 class Topics(Base):
     __tablename__ = 'topics'
 
