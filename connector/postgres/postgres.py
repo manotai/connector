@@ -125,7 +125,7 @@ class RuleTopic(Base):
     name = Column(String, nullable=False)
     description = Column(String)
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
-    answer_id = Column(Integer, ForeignKey('rules.id'), nullable=False)
+    rule_id = Column(Integer, ForeignKey('rules.id'), nullable=False)
 
     user_messages = relationship("UserMessages",
                                  secondary=ruleTopics_userMessages_association,
@@ -144,7 +144,7 @@ class Rules(Base):
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
 
     project = relationship('Project', foreign_keys=[project_id])
-    topics = relationship('RuleTopic', backref='rule', foreign_keys='RuleTopic.answer_id')
+    topics = relationship('RuleTopic', backref='rule', foreign_keys='RuleTopic.rule_id')
 
     def to_dict(self):
         return {
