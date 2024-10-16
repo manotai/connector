@@ -1,7 +1,8 @@
 from datetime import datetime
+import enum
 
 from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, Table, Float, DateTime, update, Boolean, \
-    Index, UniqueConstraint
+    Index, UniqueConstraint, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship, joinedload
@@ -43,10 +44,19 @@ user_message_keyword = Table('user_message_keyword', Base.metadata,
                              Column('keyword_id', Integer, ForeignKey('keywords.id'), primary_key=False),
                              Column('user_message_id', Integer, ForeignKey('userMessages.id'),
                                     primary_key=False),
-                             Column('project_id', Integer, ForeignKey('project.id')),
-                             UniqueConstraint('keyword_id', 'user_message_id', 'project_id',
+                             UniqueConstraint('keyword_id', 'user_message_id',
                                               name='uix_keyword_message_project')
                              )
+
+
+class ProjectType(enum.Enum):
+    public = "PUBLIC"
+    private = "PRIVATE"
+
+
+class IntentSatisfaction(str, enum.Enum):
+    MET = "Met"
+    UNMET = "Unmet"
 
 
 class Feedbacks(Base):
@@ -133,17 +143,21 @@ class UserMessages(Base):
     date = Column(DateTime, nullable=False, default=datetime.utcnow)
     sentiment = Column(String, nullable=True)
     chat_id = Column(Integer, nullable=True)
+    success = Column(Boolean, nullable=True)
 
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
-    context_id = Column(Integer, ForeignKey('contexts.id'), nullable=False)
+    context_id = Column(Integer, ForeignKey('contexts.id'), nullable=True)
     answer_id = Column(Integer, ForeignKey('chatBotAnswers.id'), nullable=False)
+    intent_id = Column(Integer, ForeignKey('intent.id'), nullable=True)
 
     project = relationship('Project', foreign_keys=[project_id])
     context = relationship("Contexts", foreign_keys=[context_id])
     answer = relationship("ChatBotAnswers", foreign_keys=[answer_id])
+    intent = relationship("Intent", foreign_keys=[intent_id])
     issues = relationship("Issues", secondary=issues_userMessages_association, back_populates="user_messages")
     topics = relationship("Topics", secondary=topics_userMessages_association, back_populates="user_messages")
     keywords = relationship("Keywords", secondary=user_message_keyword, back_populates="user_messages")
+    rules = relationship("Rules", secondary=user_message_association_custom_rules, back_populates="user_messages")
 
 
 class Keywords(Base):
@@ -157,6 +171,15 @@ class Keywords(Base):
     __table_args__ = (
         Index('ix_keywords_name', name),
     )
+
+
+class Intent(Base):
+    __tablename__ = "intent"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    satisfied = Column(Enum(IntentSatisfaction), nullable=True)
 
 
 class MessagesOriginal(Base):
