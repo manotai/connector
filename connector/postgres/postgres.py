@@ -220,7 +220,8 @@ class UserMessages(Base):
     issues = relationship("Issues", secondary=issues_userMessages_association, back_populates="user_messages")
     topics = relationship("Topics", secondary=topics_userMessages_association, back_populates="user_messages")
     keywords = relationship("Keywords", secondary=user_message_keyword, back_populates="user_messages")
-    rules = relationship("Rules", secondary=user_message_association_custom_rules, back_populates="user_messages")
+    rule_topics = relationship("RuleTopic", secondary=ruleTopics_userMessages_association,
+                               back_populates="user_messages")
 
 
 class Keywords(Base):
