@@ -295,6 +295,9 @@ class Project(Base):
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
     author_id = Column(Integer, ForeignKey('user.id'), nullable=True)
+    date = Column(DateTime, nullable=True, default=datetime.utcnow)
+    project_type = Column(Enum(ProjectType), default=ProjectType.private)
+    num_paraphrases = Column(Integer, nullable=True)
 
     users = relationship('User', secondary=user_project_association, back_populates='projects')
 
