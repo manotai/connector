@@ -48,6 +48,14 @@ user_message_keyword = Table('user_message_keyword', Base.metadata,
                                               name='uix_keyword_message_project')
                              )
 
+user_message_association_custom_rules = Table('user_message_custom_rules', Base.metadata,
+                                              Column('id', Integer, primary_key=True),
+                                              Column('rule_id', Integer, ForeignKey('rules.id')),
+                                              Column('user_message_id', Integer, ForeignKey('userMessages.id')),
+                                              UniqueConstraint('rule_id', 'user_message_id',
+                                                               name='uix_rules_user_messages')
+                                              )
+
 
 class ProjectType(enum.Enum):
     public = "PUBLIC"
@@ -180,6 +188,10 @@ class Intent(Base):
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
     satisfied = Column(Enum(IntentSatisfaction), nullable=True)
+
+    __table_args__ = (
+        Index('idx_intent_name', 'name'),
+    )
 
 
 class MessagesOriginal(Base):
