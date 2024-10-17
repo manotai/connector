@@ -83,6 +83,46 @@ class QueriesAttemptEnum(str, enum.Enum):
     AMBIGUOUS = "Ambiguous"
 
 
+class HelpfulnessEnum(str, enum.Enum):
+    VERY_UNHELPFUL = 'Very Unhelpful'
+    UNHELPFUL = 'Unhelpful'
+    NEUTRALLY_HELPFUL = 'Neutrally Helpful'
+    HELPFUL = 'Helpful'
+    VERY_HELPFUL = 'Very Helpful'
+
+
+class CorrectnessEnum(str, enum.Enum):
+    VERY_INCORRECT = 'Very Incorrect'
+    INCORRECT = 'Incorrect'
+    NEUTRALLY_CORRECT = 'Neutrally Correct'
+    CORRECT = 'Correct'
+    VERY_CORRECT = 'Very Correct'
+
+
+class CoherenceEnum(str, enum.Enum):
+    VERY_INCOHERENT = 'Very Incoherent'
+    INCOHERENT = 'Incoherent'
+    NEUTRALLY_COHERENT = 'Neutrally Coherent'
+    COHERENT = 'Coherent'
+    VERY_COHERENT = 'Very Coherent'
+
+
+class ComplexityEnum(str, enum.Enum):
+    VERY_SIMPLE = 'Very Simple'
+    SIMPLE = 'Simple'
+    NEUTRALLY_COMPLEX = 'Neutrally Complex'
+    COMPLEX = 'Complex'
+    VERY_COMPLEX = 'Very Complex'
+
+
+class VerbosityEnum(str, enum.Enum):
+    VERY_SHORT = 'Very Short'
+    SHORT = 'Short'
+    AVERAGE_LENGTH = 'Average Length'
+    VERBOSE = 'Verbose'
+    VERY_VERBOSE = 'Very Verbose'
+
+
 class Feedbacks(Base):
     __tablename__ = 'feedbacks'
 
@@ -207,6 +247,12 @@ class UserMessages(Base):
     sentiment = Column(String, nullable=True)
     chat_id = Column(Integer, nullable=True)
     attempt = Column(Enum(QueriesAttemptEnum), nullable=True)
+    # metrics
+    helpfulness = Column(Enum(HelpfulnessEnum), nullable=True)
+    correctness = Column(Enum(CorrectnessEnum), nullable=True)
+    coherence = Column(Enum(CorrectnessEnum), nullable=True)
+    complexity = Column(Enum(ComplexityEnum), nullable=True)
+    verbosity = Column(Enum(VerbosityEnum), nullable=True)
 
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
     context_id = Column(Integer, ForeignKey('contexts.id'), nullable=True)
@@ -339,6 +385,7 @@ class Dataset(Base):
     user_id = Column(Integer, ForeignKey('user.id'), nullable=True)
     date = Column(DateTime, nullable=False, default=datetime.utcnow)
     uploaded = Column(Boolean, nullable=False, default=False)
+    augment = Column(Boolean, nullable=True, default=False)
 
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
     project = relationship('Project', foreign_keys=[project_id])
