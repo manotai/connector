@@ -250,7 +250,7 @@ class UserMessages(Base):
     # metrics
     helpfulness = Column(Enum(HelpfulnessEnum), nullable=True)
     correctness = Column(Enum(CorrectnessEnum), nullable=True)
-    coherence = Column(Enum(CorrectnessEnum), nullable=True)
+    coherence = Column(Enum(CoherenceEnum), nullable=True)
     complexity = Column(Enum(ComplexityEnum), nullable=True)
     verbosity = Column(Enum(VerbosityEnum), nullable=True)
 
