@@ -2,7 +2,7 @@ from datetime import datetime
 import enum
 
 from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, Table, Float, DateTime, update, Boolean, \
-    Index, UniqueConstraint, Enum
+    Index, UniqueConstraint, Enum, ARRAY
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship, joinedload
@@ -385,7 +385,9 @@ class Dataset(Base):
     user_id = Column(Integer, ForeignKey('user.id'), nullable=True)
     date = Column(DateTime, nullable=False, default=datetime.utcnow)
     uploaded = Column(Boolean, nullable=False, default=False)
-    augment = Column(Boolean, nullable=True, default=False)
+    augmented = Column(Boolean, nullable=True, default=False)
+    label = Column(String, nullable=True)
+    augment = Column(ARRAY(Integer), nullable=False)
 
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
     project = relationship('Project', foreign_keys=[project_id])
