@@ -123,6 +123,18 @@ class VerbosityEnum(str, enum.Enum):
     VERY_VERBOSE = 'Very Verbose'
 
 
+class AugmentSetEnum(str, enum.Enum):
+    """
+    Enumerate class to represent to which set the augmented query belongs.
+
+    Attributes:
+        GOLDEN (str): The query belongs to golden set.
+        NEGATIVE (str): The query belongs to negative set.
+    """
+    GOLDEN = "Golden"
+    NEGATIVE = "Negative"
+
+
 class Feedbacks(Base):
     __tablename__ = 'feedbacks'
 
@@ -404,6 +416,8 @@ class DatasetMessage(Base):
     query = Column(String, nullable=True)
     date = Column(DateTime, default=datetime.utcnow)
     context = Column(String, nullable=True)
+    set = Column(Enum(AugmentSetEnum), nullable=True)
+
 
     dataset = relationship("Dataset", secondary=datasetMessage_dataset_association, back_populates='messages')
     user_message = relationship("UserMessages", foreign_keys=[user_message_id])
