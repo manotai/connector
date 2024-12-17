@@ -66,10 +66,24 @@ ruleTopics_userMessages_association = Table('ruleTopics_userMessages', Base.meta
                                                              name='uix_rules_topic_user_messages')
                                             )
 
+project_integration_association = Table('project_integration', Base.metadata,
+                                        Column('id', Integer, primary_key=True),
+                                        Column('project_id', Integer, ForeignKey('project.id'),
+                                               primary_key=False),
+                                        Column('integration_id', Integer, ForeignKey('integration.id'),
+                                               primary_key=False),
+                                        UniqueConstraint('project_id', 'integration_id',
+                                                         name='uix_project_integration')
+                                        )
+
 
 class ProjectType(enum.Enum):
     public = "PUBLIC"
     private = "PRIVATE"
+
+
+class IntegrationEnum(enum.Enum):
+    databricks = "DATABRICKS"
 
 
 class IntentSatisfaction(str, enum.Enum):
@@ -418,9 +432,18 @@ class DatasetMessage(Base):
     context = Column(String, nullable=True)
     set = Column(Enum(AugmentSetEnum), nullable=True)
 
-
     dataset = relationship("Dataset", secondary=datasetMessage_dataset_association, back_populates='messages')
     user_message = relationship("UserMessages", foreign_keys=[user_message_id])
+
+
+class Integration(Base):
+    __tablename__ = 'integration'
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    service_name = Column(Enum(IntegrationEnum), nullable=False)
+    credentials = Column(String, nullable=True)
+    active = Column(Boolean, default=True)
+
+    projects = relationship("Project", secondary=project_integration_association, back_populates='integrations')
 
 
 class PostgreSQLWrapper:

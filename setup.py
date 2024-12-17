@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='connector',
-    version='0.4.0',
+    version='0.4.1',
     packages=find_packages(include=['connector', 'connector.*']),
     install_requires=[
         'elasticsearch~=8.13.0',
@@ -10,7 +10,7 @@ setup(
         'pymongo',
         'requests',
         'sqlalchemy',
-        'psycopg2'
+        'psycopg2',
     ],
     author='Feedback Intelligence',
     author_email='tigran@manot.ai',
