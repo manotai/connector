@@ -401,7 +401,10 @@ class Project(Base):
     project_type = Column(Enum(ProjectType), default=ProjectType.private)
     num_paraphrases = Column(Integer, nullable=True)
 
+    author = relationship('User', foreign_keys=[author_id], lazy='joined')
     users = relationship('User', secondary=user_project_association, back_populates='projects')
+    integrations = relationship('Integration', secondary=project_integration_association, back_populates='projects')
+
 
 
 class Dataset(Base):
