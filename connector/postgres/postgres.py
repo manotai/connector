@@ -249,6 +249,12 @@ class Contexts(Base):
     )
 
 
+class Paraphrases(Base):
+    __tablename__ = 'paraphrases'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
+
+
 class ChatBotAnswers(Base):
     __tablename__ = 'chatBotAnswers'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -284,11 +290,13 @@ class UserMessages(Base):
     context_id = Column(Integer, ForeignKey('contexts.id'), nullable=True)
     answer_id = Column(Integer, ForeignKey('chatBotAnswers.id'), nullable=False)
     intent_id = Column(Integer, ForeignKey('intent.id'), nullable=True)
+    paraphrase_id = Column(Integer, ForeignKey('paraphrases.id'), nullable=True)
 
     project = relationship('Project', foreign_keys=[project_id])
     context = relationship("Contexts", foreign_keys=[context_id])
     answer = relationship("ChatBotAnswers", foreign_keys=[answer_id])
     intent = relationship("Intent", foreign_keys=[intent_id])
+    paraphrase = relationship("Paraphrases", foreign_keys=[paraphrase_id])
     issues = relationship("Issues", secondary=issues_userMessages_association, back_populates="user_messages")
     topics = relationship("Topics", secondary=topics_userMessages_association, back_populates="user_messages")
     keywords = relationship("Keywords", secondary=user_message_keyword, back_populates="user_messages")
@@ -404,7 +412,6 @@ class Project(Base):
     author = relationship('User', foreign_keys=[author_id], lazy='joined')
     users = relationship('User', secondary=user_project_association, back_populates='projects')
     integrations = relationship('Integration', secondary=project_integration_association, back_populates='projects')
-
 
 
 class Dataset(Base):
