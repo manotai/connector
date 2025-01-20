@@ -285,6 +285,7 @@ class UserMessages(Base):
     coherence = Column(Enum(CoherenceEnum), nullable=True)
     complexity = Column(Enum(ComplexityEnum), nullable=True)
     verbosity = Column(Enum(VerbosityEnum), nullable=True)
+    processed = Column(Boolean, default=False)
 
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
     context_id = Column(Integer, ForeignKey('contexts.id'), nullable=True)
