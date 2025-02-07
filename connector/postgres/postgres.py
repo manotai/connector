@@ -424,7 +424,8 @@ class Dataset(Base):
     uploaded = Column(Boolean, nullable=False, default=False)
     augmented = Column(Boolean, nullable=True, default=False)
     label = Column(String, nullable=True)
-    augment = Column(ARRAY(Integer), nullable=True)
+    augment_ids = Column(ARRAY(Integer), nullable=True)
+    augment_issue_ids = Column(ARRAY(Integer), nullable=True)
 
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
     project = relationship('Project', foreign_keys=[project_id])
