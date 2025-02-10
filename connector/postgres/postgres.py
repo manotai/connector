@@ -142,11 +142,15 @@ class AugmentSetEnum(str, enum.Enum):
     Enumerate class to represent to which set the augmented query belongs.
 
     Attributes:
-        GOLDEN (str): The query belongs to golden set.
-        NEGATIVE (str): The query belongs to negative set.
+        GOLDEN (str): The query belongs to Golden set.
+        HALLUCINATIONS (str): The query belongs to Hallucinations set.
+        MISALIGNMENT_WITH_USER_INTENT (str): The query belongs to Misalignment with User Intent set.
+        OUT_OF_CONTEXT_RESPONSE (str): The query belongs to Out-of-Context Response set.
     """
     GOLDEN = "Golden"
-    NEGATIVE = "Negative"
+    HALLUCINATIONS = "Hallucinations"
+    MISALIGNMENT_WITH_USER_INTENT = "Misalignment with User Intent"
+    OUT_OF_CONTEXT_RESPONSE = "Out-of-Context Response"
 
 
 class Feedbacks(Base):
