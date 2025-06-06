@@ -137,6 +137,32 @@ class VerbosityEnum(str, enum.Enum):
     VERY_VERBOSE = 'Very Verbose'
 
 
+class ReportStatus(enum.Enum):
+    processing = 'processing'
+    done = 'done'
+    failed = 'failed'
+
+
+class ReportType(enum.Enum):
+    INTENT = "Intent"
+    ISSUE_TYPE = "Issue Type"
+    HELPFULNESS = "Helpfulness"
+    QUERY_SENTIMENT = "Query Sentiment"
+    RESPONSE_SENTIMENT = "Response Sentiment"
+    SATISFACTION = "Satisfaction"
+    CORRECTNESS = "Correctness"
+    VERBOSITY = "Verbosity"
+    ERROR_RATE = "Error Rate"
+    COHERENCE = "Coherence"
+    INTERACTION_TYPE = "Interaction Type"
+    KEYWORDS = "Keywords"
+
+
+class ReportSubtype(enum.Enum):
+    BY_CHAT = "By chat"
+    BY_INTERACTION = "By interaction"
+
+
 class AugmentSetEnum(str, enum.Enum):
     """
     Enumerate class to represent to which set the augmented query belongs.
@@ -460,6 +486,17 @@ class Integration(Base):
     active = Column(Boolean, default=True)
 
     projects = relationship("Project", secondary=project_integration_association, back_populates='integrations')
+
+
+class Report(Base):
+    __tablename__ = 'report'
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    status = Column(Enum(ReportStatus), nullable=False)
+    project_id = Column(Integer, ForeignKey('project.id'), nullable=False)
+    max_user_message_id = Column(Integer, nullable=False)
+    version = Column(Integer, nullable=False)
+    type = Column(Enum(ReportType), nullable=False)
+    subtype = Column(Enum(ReportSubtype), nullable=False)
 
 
 class PostgreSQLWrapper:
