@@ -86,7 +86,7 @@ class IntegrationEnum(enum.Enum):
     databricks = "DATABRICKS"
 
 
-class IntentSatisfaction(str, enum.Enum):
+class IntentSatisfactionEnum(str, enum.Enum):
     MET = "Met"
     UNMET = "Unmet"
 
