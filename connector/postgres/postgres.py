@@ -137,6 +137,38 @@ class VerbosityEnum(str, enum.Enum):
     VERY_VERBOSE = 'Very Verbose'
 
 
+class SatisfactionEnum(str, enum.Enum):
+    """
+    Enumerate class to represent satisfaction categories.
+
+    Attributes:
+        VERY_UNSATISFIED (str): Represents an extremely negative level of satisfaction.
+        UNSATISFIED (str): Represents a negative level of satisfaction.
+        NEUTRAL (str): Represents a neutral level of satisfaction.
+        SATISFIED (str): Represents a positive level of satisfaction.
+        VERY_SATISFIED (str): Represents an extremely positive level of satisfaction.
+    """
+    VERY_UNSATISFIED = 'Very Unsatisfied'
+    UNSATISFIED = 'Unsatisfied'
+    NEUTRAL = 'Neutral'
+    SATISFIED = 'Satisfied'
+    VERY_SATISFIED = 'Very Satisfied'
+
+
+class SentimentEnum(str, enum.Enum):
+    """
+    Enumerate class to represent the sentiment categories in texts.
+
+    Attributes:
+        NEGATIVE (str): Represents a negative sentiment of the text.
+        NEUTRAL (str): Represents a neutral sentiment of the text.
+        POSITIVE (str): Represents a positive sentiment of the text.
+    """
+    NEGATIVE = "Negative"
+    NEUTRAL = "Neutral"
+    POSITIVE = "Positive"
+
+
 class ReportStatus(enum.Enum):
     processing = 'processing'
     done = 'done'
@@ -304,9 +336,9 @@ class UserMessages(Base):
     question = Column(String)
     prompt = Column(String)
     knowledge_hole_probability = Column(Float)
-    satisfaction = Column(String, nullable=True)
+    satisfaction = Column(Enum(SatisfactionEnum), nullable=True)
     date = Column(DateTime, nullable=False, default=datetime.utcnow)
-    sentiment = Column(String, nullable=True)
+    sentiment = Column(Enum(SentimentEnum), nullable=True)
     chat_id = Column(Integer, nullable=True)
     attempt = Column(Enum(QueriesAttemptEnum), nullable=True)
     # metrics
