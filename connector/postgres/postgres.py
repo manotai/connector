@@ -321,7 +321,7 @@ class ChatBotAnswers(Base):
     __tablename__ = 'chatBotAnswers'
     id = Column(Integer, primary_key=True, autoincrement=True)
     text = Column(String, nullable=False)
-    sentiment = Column(String, nullable=True)
+    sentiment = Column(Enum(SentimentEnum), nullable=True)
     version = Column(String, nullable=True)
 
     feedback_id = Column(Integer, ForeignKey("feedbacks.id"), nullable=True)
