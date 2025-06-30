@@ -386,7 +386,7 @@ class Intent(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
-    satisfied = Column(Enum(IntentSatisfaction), nullable=True)
+    satisfied = Column(Enum(IntentSatisfactionEnum), nullable=True)
 
     __table_args__ = (
         Index('idx_intent_name', 'name'),
