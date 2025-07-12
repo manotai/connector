@@ -77,6 +77,12 @@ project_integration_association = Table('project_integration', Base.metadata,
                                         )
 
 
+class ProcessingStatus(str, enum.Enum):
+    unprocessed = 'Unprocessed'
+    queued = 'Queued'
+    processed = 'Processed'
+
+
 class ProjectType(enum.Enum):
     public = "PUBLIC"
     private = "PRIVATE"
@@ -315,6 +321,22 @@ class Paraphrases(Base):
     __tablename__ = 'paraphrases'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
+
+
+class Chat(Base):
+    __tablename__ = 'chat'
+    id = Column(String, primary_key=True)
+    status = Column(Enum(ProcessingStatus), nullable=False, default=ProcessingStatus.unprocessed)
+    satisfaction = Column(Enum(SatisfactionEnum), nullable=True)
+    issue_id = Column(Integer, ForeignKey("issues.id"), nullable=True)
+    intent_id = Column(Integer, ForeignKey("intent.id"), nullable=True)
+    helpfulness = Column(Enum(HelpfulnessEnum), nullable=True)
+    correctness = Column(Enum(CorrectnessEnum), nullable=True)
+    coherence = Column(Enum(CoherenceEnum), nullable=True)
+    complexity = Column(Enum(ComplexityEnum), nullable=True)
+    verbosity = Column(Enum(VerbosityEnum), nullable=True)
+    query_sentiment = Column(Enum(SentimentEnum), nullable=True)
+    response_sentiment = Column(Enum(SentimentEnum), nullable=True)
 
 
 class ChatBotAnswers(Base):
