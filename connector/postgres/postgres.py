@@ -338,6 +338,9 @@ class Chat(Base):
     response_sentiment = Column(Enum(SentimentEnum), nullable=True)
     error_rate = Column(Integer, nullable=True)
 
+    intent = relationship("Intent", foreign_keys=[intent_id])
+    issue = relationship("Issues", foreign_keys=[issue_id])
+
 
 class ChatBotAnswers(Base):
     __tablename__ = 'chatBotAnswers'
@@ -548,7 +551,6 @@ class Report(Base):
     status = Column(Enum(ReportStatus), nullable=False)
     project_id = Column(Integer, ForeignKey('project.id'), nullable=False)
     max_user_message_id = Column(Integer, nullable=False)
-    version = Column(Integer, nullable=False)
     type = Column(Enum(ReportType), nullable=False)
     subtype = Column(Enum(ReportSubtype), nullable=False)
 
