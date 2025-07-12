@@ -333,10 +333,10 @@ class Chat(Base):
     helpfulness = Column(Enum(HelpfulnessEnum), nullable=True)
     correctness = Column(Enum(CorrectnessEnum), nullable=True)
     coherence = Column(Enum(CoherenceEnum), nullable=True)
-    complexity = Column(Enum(ComplexityEnum), nullable=True)
     verbosity = Column(Enum(VerbosityEnum), nullable=True)
     query_sentiment = Column(Enum(SentimentEnum), nullable=True)
     response_sentiment = Column(Enum(SentimentEnum), nullable=True)
+    error_rate = Column(Integer, nullable=True)
 
 
 class ChatBotAnswers(Base):
