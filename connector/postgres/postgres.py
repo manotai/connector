@@ -95,6 +95,8 @@ class IntegrationEnum(enum.Enum):
 class IntentSatisfactionEnum(str, enum.Enum):
     MET = "Met"
     UNMET = "Unmet"
+    AMBIGUOUS = "Ambiguous"
+
 
 
 class QueriesAttemptEnum(str, enum.Enum):
@@ -337,6 +339,7 @@ class Chat(Base):
     query_sentiment = Column(Enum(SentimentEnum), nullable=True)
     response_sentiment = Column(Enum(SentimentEnum), nullable=True)
     error_rate = Column(Integer, nullable=True)
+    intent_satisfaction = Column(Enum(IntentSatisfactionEnum), nullable=True)
 
     intent = relationship("Intent", foreign_keys=[intent_id])
     issue = relationship("Issues", foreign_keys=[issue_id])
@@ -366,6 +369,7 @@ class UserMessages(Base):
     sentiment = Column(Enum(SentimentEnum), nullable=True)
     chat_id = Column(Integer, nullable=True)
     attempt = Column(Enum(QueriesAttemptEnum), nullable=True)
+    intent_satisfaction = Column(Enum(IntentSatisfactionEnum), nullable=True)
     # metrics
     helpfulness = Column(Enum(HelpfulnessEnum), nullable=True)
     correctness = Column(Enum(CorrectnessEnum), nullable=True)
