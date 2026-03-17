@@ -361,6 +361,7 @@ class UserMessages(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, nullable=True)
+    trace_id = Column(String, nullable=True)
     question = Column(String)
     prompt = Column(String)
     knowledge_hole_probability = Column(Float)
